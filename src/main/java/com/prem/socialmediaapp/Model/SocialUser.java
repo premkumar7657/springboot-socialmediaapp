@@ -21,12 +21,13 @@ public class SocialUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "socialUser")
+    //cascade = {CascadeType.MERGE, CascadeType.PERSIST}
+    @OneToOne(mappedBy = "socialUser", cascade = CascadeType.ALL)
     //@JoinColumn(name = "social_profile_")
    // @JsonIgnore //circular reference
     public SocialProfile socialProfile;
 
-    @OneToMany(mappedBy = "socialUser")
+    @OneToMany(mappedBy = "socialUser", fetch = FetchType.EAGER) //fetch = FetchType.LAZY
    // @JsonIgnore //circular reference
     private List<Post> posts;
 
@@ -34,6 +35,12 @@ public class SocialUser {
     //@JsonIgnore //circular reference
     private Set<SocialGroup> socialGroups = new HashSet<>();
 
+    public void setSocialProfile(SocialProfile socialProfile) {
+        this.socialProfile = socialProfile;
+        if (socialProfile != null) {
+            socialProfile.setSocialUser(this); // maintain both sides
+        }
+    }
 
     @Override
     public int hashCode()
